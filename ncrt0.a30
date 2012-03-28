@@ -1,0 +1,182 @@
+;/*********************************************************************************
+;*																				 
+;*	File Name:   ncrt0.a30                                        						 
+;*                                                                  				 
+;*   description: Customized startup program for the M30102 microcontroller. 
+;*                Programs complied with this startup file will run under 
+;*                the USB Monitor or 'stand alone'.
+;**********************************************************************************                                                                 				 
+;*	Copyright (c) 2002 Mitsubishi Electric and Electronics USA, Inc.              *    
+;*	All rights reserved															  *
+;**********************************************************************************
+;*	The software supplied by Mitsubishi Electric and Electronics USA, Inc. 		  *
+;*	is intended and supplied for use on Mitsubishi Electric  products. 			  *
+;*	This software is owned by Mitsubishi Electric and Electronics USA, Inc.  	  *
+;*	or Mitsubishi Electric Corporation and is protected under applicable 		  *
+;*	copyright laws. All rights are reserved. Any use of this software in 		  *
+;*	violation of the use and restrictions described herein may subject user 	  *
+;*	to criminal sanctions under applicable laws, as well as to civil 			  *
+;*	liability for breach of the terms and conditions of this use license.		  *
+;* 																				  *
+;*	THIS SOFTWARE IS PROVIDED "AS IS". NO WARRANTIES, WHETHER EXPRESS, IMPLIED 	  *
+;*	OR STATUTORY, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF 			  *
+;*	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.  *
+;*	MITSUBISHI ELECTRIC AND ELECTRONICS USA, INC. AND MITSUBISHI ELECTRIC 		  * 
+;*	CORPORATION RESERVE THE RIGHT, WITHOUT NOTICE, TO MAKE CHANGES TO THIS 		  *
+;*	SOFTWARE. NEITHER MITSUBISHI ELECTRIC AND ELECTRONICS USA, INC. NOR 		  *
+;*   MITSUBISHI ELECTRIC CORPORATION SHALL, IN ANY CIRCUMSTANCES, BE LIABLE 	  *
+;*	FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES FOR ANY REASON WHATSOEVER   *
+;*	ARISING OUT OF THE USE OR APPLICATION OF THIS SOFTWARE.	 					  *
+;*                                                               				  *
+;*================================================================================*
+;*	$Log: ncrt0.a30,v $
+;*	Revision 1.2  2002-06-07 14:00:17-04  bembry
+;*	Fixed flicker problem.  Chang Temp conversion equation fixes problem at "0" crossover point.
+;*
+;*================================================================================*/
+;---------------------------------------------------------------------
+; Section allocation and definitions
+;---------------------------------------------------------------------
+	.list OFF
+	.include sect30.inc
+	.list ON
+
+;====================================================================
+; Interrupt section start
+;---------------------------------------------------------------------
+	.insf	start,S,0
+	.glb	start
+	.section	interrupt
+start:
+;---------------------------------------------------------------------
+; after reset, execution starts here
+;---------------------------------------------------------------------
+; Upon reset, the processor clock (bclk) is divided by 8 (f/8) and is running 
+; off of the internal ring ocsilator. 
+
+    ldc	    #istack_top,isp	    ;set istack pointer
+
+	bset	0,protect			; enable writing to Clock Control Register 0, 1.
+	bclr    6,cm0			    ; Set bit 6 of CM0 to 0, divide by 1 mode 
+	bclr    6,cm1		  	    ; Set bit 6 of CM1 to 0, divide by 1 mode
+
+;----------------------------------------------------------------------
+; The following 2 lines will enable clock monitoring interrupts. DO NOT 
+; ENABLE if Xin < 2MHz. A minimal interrupt service routine is given at 
+; the end of this file (and the vector points to it). See the "Oscillation 
+; Stop Detection" chapter of the M30102 data sheets.
+;----------------------------------------------------------------------
+	bset	0,cm2			; enable Oscillation stop detection bit
+	bset    1,cm2			; enable OSC stop detection interrupt. 
+
+; now determine type of Xin (RC osc or XTAL), ensure it is running and if so
+; switch to it
+
+	btst  	3,cm2			; check for Xin operation.
+	jz     ENABLE_XIN		; jmp if MAIN OSC is running
+	bset    3,cm1			; if not, enable RC OSC. 
+	nop						; wait for RC OSC to stabilize
+	nop
+	nop						
+	btst  	3,cm2			; check for RC-OSC operation.
+	jnz     CONTINUE_INIT 	; skip if RC-OSC is not running. 
+	
+ENABLE_XIN:
+	mov.b   #00h,cm2	   ; Set main clock to Xin  
+
+CONTINUE_INIT:	
+	bclr	0,protect	   ; inhibit writing to Clock Control Registers 0,1,2.	 	  	
+	ldc	    #0000h,	flg
+	ldc	    #data_SE_top,	sb	;set sb register 
+	ldintb	#VECTOR_ADR
+	fset     i		;enable interrupts. Do not disable interrupt while 
+	                ;using the USB Monitor. 
+
+;====================================================================
+; Variable area initialize. This code uses the macros in "sect30.inc"  
+; for initializing C variables. Clears global variables, sets 
+; intialized variables, etc.
+;====================================================================
+; NEAR area initialize.
+;--------------------------------------------------------------------
+; bss zero clear
+;--------------------------------------------------------------------
+	N_BZERO	bss_SE_top,bss_SE
+	N_BZERO	bss_SO_top,bss_SO
+	N_BZERO	bss_NE_top,bss_NE
+	N_BZERO	bss_NO_top,bss_NO
+
+;---------------------------------------------------------------------
+; initialize data section
+;---------------------------------------------------------------------
+	N_BCOPY data_SEI_top,data_SE_top,data_SE
+	N_BCOPY	data_SOI_top,data_SO_top,data_SO
+	N_BCOPY	data_NEI_top,data_NE_top,data_NE
+	N_BCOPY	data_NOI_top,data_NO_top,data_NO
+
+
+;====================================================================
+
+	.stk	-40     ;for use with stkviewer. Note the KNC30 version 
+	                ; of the compiler does not have this option.
+
+;====================================================================
+; heap area initialize. Uncomment these instructions if using memory 
+; allocate functions.
+;---------------------------------------------------------------------
+;	.glb	__mbase
+;	.glb	__mnext
+;	.glb	__msize
+;	mov.w	#(heap_top&0FFFFH), __mbase
+;	mov.w	#(heap_top>>16), __mbase+2
+;	mov.w	#(heap_top&0FFFFH), __mnext
+;	mov.w	#(heap_top>>16), __mnext+2
+;	mov.w	#(HEAPSIZE&0FFFFH), __msize
+;	mov.w	#(HEAPSIZE>>16), __msize+2
+;====================================================================
+; Initialize standard I/O
+;---------------------------------------------------------------------
+	.glb	_init
+;	.call	_init,G			;for use with stkviewer
+;	jsr.a	_init           ;required if using I/O stream serial port driver
+
+
+;====================================================================
+; Call main() function
+;---------------------------------------------------------------------
+
+	.glb	_main
+	jsr.a	_main
+
+;====================================================================
+; exit() function. This function is used in case of accidental return 
+; from main() or debugging code could be placed here. 
+;---------------------------------------------------------------------
+	.glb	_exit
+	.glb	$exit
+_exit:			   ; End program
+$exit:
+	jmp	_exit
+	.einsf			;for use with stkviewer
+;====================================================================
+; dummy interrupt function. Used for all unassigned interrupts
+;---------------------------------------------------------------------
+dummy_int:
+	reit
+
+;====================================================================
+; Minimal interrupt service routine for Oscillator Stop Interrupt. If an
+; Oscillator Stop Interrupt occurs and CM1, bit 1 is not cleared,
+; multiple interrupts will occur. This routine assumes the watchdog
+; timer IS NOT ENABLED (watchdog and OSC STOP share same interrupt vector).
+; It is strongly recommended that the user implement a complete interrupt
+; service routine.
+;---------------------------------------------------------------------
+basic_oscstop:
+    bclr 1,cm2
+	bclr 2,tcss
+	reit
+
+	.end
+
+

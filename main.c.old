@@ -1,0 +1,374 @@
+/*********************************************************************************
+*                                                                                
+*   File Name:   main.c                                                                
+*                                                                                
+*   Content:     Contains main loop for demo code                                                                
+**********************************************************************************                                                                               
+*   Copyright (c) 2002 Mitsubishi Electric and Electronics USA, Inc.             *    
+*   All rights reserved                                                          *
+**********************************************************************************
+*   The software supplied by Mitsubishi Electric and Electronics USA, Inc.       *
+*   is intended and supplied for use on Mitsubishi Electric  products.           *
+*   This software is owned by Mitsubishi Electric and Electronics USA, Inc.      *
+*   or Mitsubishi Electric Corporation and is protected under applicable         *
+*   copyright laws. All rights are reserved.                                     *                                                                                *
+*   THIS SOFTWARE IS PROVIDED "AS IS". NO WARRANTIES, WHETHER EXPRESS, IMPLIED   *
+*   OR STATUTORY, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF             *
+*   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. *
+*   MITSUBISHI ELECTRIC AND ELECTRONICS USA, INC. AND MITSUBISHI ELECTRIC        *
+*   CORPORATION RESERVE THE RIGHT, WITHOUT NOTICE, TO MAKE CHANGES TO THIS       *
+*   SOFTWARE. NEITHER MITSUBISHI ELECTRIC AND ELECTRONICS USA, INC. NOR          *
+*   MITSUBISHI ELECTRIC CORPORATION SHALL, IN ANY CIRCUMSTANCES, BE LIABLE       *
+*   FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES FOR ANY REASON WHATSOEVER  *
+*   ARISING OUT OF THE USE OR APPLICATION OF THIS SOFTWARE.                      *
+*                                                                                *
+*================================================================================*
+*   $Log: main.c,v $
+*   Revision 1.2  2002-06-07 14:00:18-04  bembry
+*   Fixed flicker problem.  Chang Temp conversion equation fixes problem at "0" crossover point.
+*
+*================================================================================*/
+#include <stdlib.h>
+#include "10sk.h"		/* SFR register definition */
+#include "rtc.h"        /* real time clock function. */
+#include "delayTimer.h" /* delay timer for compass I2C readings*/
+#include "compass.h"  //analog compass andrew mcknight
+#include "hmc6352.h"		//digital compass revised andrew mcknight
+
+void display_task(void);
+void mode_task(void);
+void display_welcome_message(void);
+void display_time(char ln);
+void AD_sample_task(void);
+void AD_compass_task(void);
+//#pragma INTERRUPT ad_intr_handler
+void ad_intr_handler(void);
+
+
+unsigned char ad_flag;
+unsigned char sys_mode;
+enum SYSTEM_MODES{SET_HEADING=0,DIS_HEADING_TIME,MOVE_SHAFT};
+char cur_hour, cur_min, cur_sec, last_sec;
+char key;
+const char message[8][9] = {
+{"SET HOUR"},
+{"SET MIN "},
+{"MAIN OSC"},
+{"RUNNING "},
+{"STOPPED "},
+{"        "},
+{"SET DEG "},
+{"CALIBRAT"}};
+
+const char num[15] = {'0','1','2','3','4','5','6','7','8','9',':','F','C',' ','.'};
+const char deg_S[8] = {0x08,0x14,0x08,0x00,0x00,0x00,0x00,0x00};
+unsigned char clock_mode_change;    // set according to mode of clock.              
+unsigned char temp_mess_dis_timer;  // temp display timer. 
+unsigned char current_sys_mode;     // return to mode after time out. 
+unsigned char temp_display_mode;    // allows setting of temp display mode. 
+unsigned char clock_fault_reset;    
+unsigned char init_osc_det; 
+unsigned char clock_mode_charnge; 
+unsigned int ad_value, avg_ad_value;                 //ad values.
+unsigned int ad_compass;  //for the compass analog2digital value
+double avg_ad_compass;	//for the compass average value
+int setOffSet;    //for initilizing compass offset
+float temperature;
+// added object from compass.h
+compass heading={0,0,0,"        ","        "};
+//end of created object from compass.h
+
+/*****************************************************************************
+Name:		main
+Parameters:	None
+Returns:	None 
+Description: Initializes the system and then responds to user actions.
+*****************************************************************************/
+void main()
+{
+	heading.strHeading[3]=0x07;
+	heading.strHeading[7]=0x07;
+    init_BSP();     // Intialize Board Support Package.
+    disp_ctrlw(0x78); // write CGRAM address pointer 
+    for (key=0; key <8; key++)   // degree symbole is 0x08 hex.  
+        disp_dataw(deg_S[key]);  // Write degree symbole to LCD's CGRAM area.       
+    sys_mode =  SET_HEADING;
+    cur_hour = 0; cur_min = 0; cur_sec = 0; last_sec = 0;   // Intialize clock variables
+	init_Timer();
+	set_time(cur_hour,cur_min,cur_sec);
+    /*** enable 32K clcok for real time clock.****/
+    prc0 = 1;       // Enable writes to clock control register.
+    cm03 = 1;       // Xcin, Xcout high drive mode  
+    cm04 = 1;       // Enable Xcin, Xcout ports 
+    cm2 = 0x03;      // Enable OSC STOPPED detection 
+    prc0 = 0;       // Disable writes to clock control register. 
+	/*** setup input for shaft extended all ,shaft in all ****/
+	pd4_2=0;//shaft in all input
+	pd4_3=0;// shaft out all input
+	/*** setup output move shaft in, move shaft out ****/
+	pd4_0=1;//move shaft in
+	pd4_1=1;//move shaft out               
+	/** setup led ouput ***/
+	pd4_4=1;
+	/****   Initialize Digital compass reading **************/
+	HMC6352_Init();
+	/****   End of Initialize Digital compass reading **************/
+    init_osc_det = 0;
+    clock_fault_reset = 0;
+    temp_mess_dis_timer = 0;
+    clock_mode_charnge = 0;
+	
+    addTask(display_task, 30, 1);
+    addTask(mode_task, 20, 2);
+    addTask(AD_sample_task, 10/*5*/, 3);//changed to 100 milli sec? for digital compass read
+    Run_RR_Scheduler();
+}
+/*****************************************************************************
+Name:         display_task  
+Parameters:                     
+Returns:        
+Description:  Display data on LCD screen dependent on mode of operation.   
+
+*****************************************************************************/
+void display_task(void)
+{
+static unsigned int dis_temp;
+static unsigned int result;
+static char Flag_t100;
+int compDiff=0;
+int accrossN=0;
+    switch(sys_mode){
+		case SET_HEADING:
+            display(0, message[6]);
+            display(1, heading.strHeading);
+		break;
+ 		case DIS_HEADING_TIME:
+			display(0,heading.strHeading);
+			compDiff=abs((heading.current-heading.desired));
+			if(compDiff>180){
+				compDiff=abs(compDiff-360);
+				accrossN=1;
+			}
+			if(compDiff>4){
+				if((heading.current>heading.desired && accrossN==0) || (accrossN==1 && heading.current<heading.desired)){
+					if(!p4_2){
+						p4_1=0;//set move out to off
+						//p4_0=1;//set move in to on
+						p4_4=1;//turn on led
+						display(1,"   <--  ");
+					}
+				}
+				else{
+					if(!p4_3){
+						p4_0=0;//set move in to off
+						//p4_1=1;//set move out to on
+						p4_4=1;//turn on led
+						display(1,"   -->  ");
+					}
+				}
+			}
+			else{
+				p4_1=0;//set move out to off
+				p4_0=0;//set move in to on
+				p4_4=0;//turn on led
+				get_time(&cur_hour, &cur_min, &cur_sec);
+				display_time(1);
+			}
+			if(p4_2){
+				p4_0=0;
+				display(1,"SHAFT IN");
+			}
+			else if(p4_3){
+				p4_1=0;
+				display(1,"SHAFTOUT");
+			}
+
+		break;
+		case MOVE_SHAFT:
+			display(0,"SET POS ");
+			if(p4_2 || p4_3){
+				if(p4_2){
+					p4_0=0;
+					display(1,"SHAFT IN");
+				}
+				else{
+					p4_1=0;
+					display(1,"SHAFTOUT");
+				}
+			}
+			else if(p4_0){
+				display(1,"   <--  ");
+			}
+			else if(p4_1){
+				display(1,"   -->  ");
+			}
+			else{
+				display(1,"        ");
+			}
+			break;
+		default:
+			display(0,heading.strHeading);
+		break;				
+        }
+}
+/*****************************************************************************
+Name:         mode_task  
+Parameters:                     
+Returns:        
+Description:  Process key inputs and changes mode and data.    
+*****************************************************************************/
+void mode_task(void)
+{	
+	int cali=0;
+	int i=1;
+    key = dequeue_key();
+    switch(sys_mode){
+		case SET_HEADING:
+            switch(key){
+                case KEY_A: // mode change
+                    sys_mode = MOVE_SHAFT;
+					if(setOffSet==1)
+						set_OffSet(&heading);
+					setOffSet=0;
+					disp_ctrlw(LCD_CLEAR);
+                   break;
+                case KEY_B:
+					display(0,message[7]);
+					cali=calibrate();
+					set_compass(&heading,(int)(cali/10));
+					do{
+						tdelay(mSECONDS(140));
+						keyinput_down();
+						key=dequeue_key();
+						change_heading(&heading,-i);		 // Function in "compass.c".
+						display(1, heading.strHeading);
+						if(i<20)
+							i+=2;
+					}while(key==KEY_B);
+					i=1;
+                   break;
+                case KEY_C:
+					do{
+						tdelay(mSECONDS(140));
+						keyinput_down();
+						key=dequeue_key();
+						change_heading(&heading,i);		 // Function in "compass.c".
+						display(1, heading.strHeading);
+						if(i<20)
+							i+=2;
+					}while(key==KEY_C);
+					i=1;
+                   break;
+                }
+            break;
+        case DIS_HEADING_TIME:
+            switch(key){
+                case KEY_A:
+					sys_mode= SET_HEADING;
+                    disp_ctrlw(LCD_CLEAR);					
+                    break;
+                case KEY_B: 
+                case KEY_C: // Goto set time 
+                    break;
+                default:
+                    break;
+                }
+            break;
+		case MOVE_SHAFT:
+            switch(key){
+                case KEY_A: // mode change
+                    sys_mode = DIS_HEADING_TIME;
+					disp_ctrlw(LCD_CLEAR);
+                   break;
+                case KEY_B:
+					if(!p4_2){
+						p4_0=1;
+						p4_4=1;
+						do{
+							tdelay(mSECONDS(140));
+							keyinput_down();
+							key=dequeue_key();
+							display(1,"   <--  " );
+						}while(key==KEY_B && !p4_2);
+					}
+					p4_0=0;
+					p4_4=0;
+                   break;
+                case KEY_C:
+					if(!p4_3){
+						p4_1=1;
+						p4_4=1;
+						do{
+							tdelay(mSECONDS(140));
+							keyinput_down();
+							key=dequeue_key();
+							display(1,"   -->  " );
+						}while(key==KEY_C && !p4_3);
+					}
+					p4_1=0;
+					p4_4=0;
+                   break;
+                }
+            break;
+        default:
+            break;
+        }
+}
+/*****************************************************************************
+Name:           display_time      
+Parameters:     ln --> LCD line number.                     
+Returns:        
+Description:    display current time on line 0 of 1 of LCD.    
+
+*****************************************************************************/
+void display_time(char ln)
+{
+	static unsigned char result;
+	if(ln == 0)
+		result = LCD_HOME_L1;
+	else 
+		result = LCD_HOME_L2; 
+	disp_ctrlw(result);      // home to line ln
+	result = cur_hour / 10;  disp_dataw(num[result]);
+	result = cur_hour - (result * 10); disp_dataw(num[result]);
+	disp_dataw(num[10]);    // print ":"
+	result = cur_min / 10; disp_dataw(num[result]);
+	result = cur_min - (result * 10);  disp_dataw(num[result]);
+	disp_dataw(num[10]);    // print ":"
+	result = cur_sec / 10;  disp_dataw(num[result]);
+	result = cur_sec - (result * 10);  disp_dataw(num[result]);
+}
+/*****************************************************************************
+Name:         AD_sample_task 
+Parameters:                     
+Returns:        
+Description:  gets the heading from I2c protocol handler and sets the compass
+				direction
+
+*****************************************************************************/
+void AD_sample_task(void)
+{
+	//static int countCC=2;
+	double degrees=0;
+	//if(--countCC==0){
+		degrees=sample();
+	//	countCC=2;
+	//}
+	if(degrees)
+		set_compass(&heading,degrees/10);
+	else
+		bad_strCurrent(&heading); 
+	//wait_ticks(2000);
+}
+/*****************************************************************************
+Name:        ad_intr_handler   
+Parameters:                     
+Returns:        
+Description:  AD interrupt handler.   
+
+*****************************************************************************/
+void ad_intr_handler(void)
+{
+	ad_compass = ad +1;
+    adst = 0;
+}

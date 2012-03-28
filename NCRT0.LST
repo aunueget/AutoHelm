@@ -1,0 +1,274 @@
+* M16C FAMILY ASSEMBLER *   SOURCE LIST       Wed Mar 21 16:11:30 2012  PAGE 001
+
+  SEQ.  LOC.   OBJ.              0XMSDA ....*....SOURCE STATEMENT....7....*....8....*....9....*....0....*....1....*....2....*....3....*....4
+
+     1                                  ;/*********************************************************************************
+     2                                  ;*													
+     3                                  ;*	File Name:   ncrt0.a30                                        					
+     4                                  ;*                                                                  				 
+     5                                  ;*   description: Customized startup program for the M30102 microcontroller. 
+     6                                  ;*                Programs complied with this startup file will run under 
+     7                                  ;*                the USB Monitor or 'stand alone'.
+     8                                  ;**********************************************************************************                 
+     9                                  ;*	Copyright (c) 2002 Mitsubishi Electric and Electronics USA, Inc.              *    
+    10                                  ;*	All rights reserved										
+    11                                  ;**********************************************************************************
+    12                                  ;*	The software supplied by Mitsubishi Electric and Electronics USA, Inc. 		  *
+    13                                  ;*	is intended and supplied for use on Mitsubishi Electric  products. 			  *
+    14                                  ;*	This software is owned by Mitsubishi Electric and Electronics USA, Inc.  	  *
+    15                                  ;*	or Mitsubishi Electric Corporation and is protected under applicable 		  *
+    16                                  ;*	copyright laws. All rights are reserved. Any use of this software in 		  *
+    17                                  ;*	violation of the use and restrictions described herein may subject user 	  *
+    18                                  ;*	to criminal sanctions under applicable laws, as well as to civil 			  *
+    19                                  ;*	liability for breach of the terms and conditions of this use license.		  *
+    20                                  ;* 													
+    21                                  ;*	THIS SOFTWARE IS PROVIDED "AS IS". NO WARRANTIES, WHETHER EXPRESS, IMPLIED 	  *
+    22                                  ;*	OR STATUTORY, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF 			  *
+    23                                  ;*	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.  *
+    24                                  ;*	MITSUBISHI ELECTRIC AND ELECTRONICS USA, INC. AND MITSUBISHI ELECTRIC 		  * 
+    25                                  ;*	CORPORATION RESERVE THE RIGHT, WITHOUT NOTICE, TO MAKE CHANGES TO THIS 		  *
+    26                                  ;*	SOFTWARE. NEITHER MITSUBISHI ELECTRIC AND ELECTRONICS USA, INC. NOR 		  *
+    27                                  ;*   MITSUBISHI ELECTRIC CORPORATION SHALL, IN ANY CIRCUMSTANCES, BE LIABLE 	  *
+    28                                  ;*	FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES FOR ANY REASON WHATSOEVER   *
+    29                                  ;*	ARISING OUT OF THE USE OR APPLICATION OF THIS SOFTWARE.	 					
+    30                                  ;*                                                               				  *
+    31                                  ;*================================================================================*
+    32                                  ;*	$Log: ncrt0.a30,v $
+    33                                  ;*	Revision 1.2  2002-06-07 14:00:17-04  bembry
+    34                                  ;*	Fixed flicker problem.  Chang Temp conversion equation fixes problem at "0" crossover point.
+    35                                  ;*
+    36                                  ;*================================================================================*/
+    37                                  ;---------------------------------------------------------------------
+    38                                  ; Section allocation and definitions
+    39                                  ;---------------------------------------------------------------------
+    40                                  	.list OFF
+    41                                  	.list ON
+    42                                  
+    43                                  ;====================================================================
+    44                                  ; Interrupt section start
+    45                                  ;---------------------------------------------------------------------
+    46                                  	.insf	start,S,0
+    47                                  	.glb	start
+    48                                  	.section	interrupt
+    49  00000                           start:
+    50                                  ;---------------------------------------------------------------------
+    51                                  ; after reset, execution starts here
+    52                                  ;---------------------------------------------------------------------
+    53                                  ; Upon reset, the processor clock (bclk) is divided by 8 (f/8) and is running 
+    54                                  ; off of the internal ring ocsilator. 
+    55                                  
+    56  00000  EB407F07                     ldc	    #istack_top,isp	    ;set istack pointer
+    57                                  
+    58  00004  7E9F5000                 	bset	0,protect			; enable writing to Clock Control Register 0, 1.
+    59  00008  7E8F3600                 	bclr    6,cm0			    ; Set bit 6 of CM0 to 0, divide by 1 mode 
+    60  0000C  7E8F3E00                 	bclr    6,cm1		  	    ; Set bit 6 of CM1 to 0, divide by 1 mode
+    61                                  
+    62                                  ;----------------------------------------------------------------------
+* M16C FAMILY ASSEMBLER *   SOURCE LIST       Wed Mar 21 16:11:30 2012  PAGE 002
+
+  SEQ.  LOC.   OBJ.              0XMSDA ....*....SOURCE STATEMENT....7....*....8....*....9....*....0....*....1....*....2....*....3....*....4
+
+    63                                  ; The following 2 lines will enable clock monitoring interrupts. DO NOT 
+    64                                  ; ENABLE if Xin < 2MHz. A minimal interrupt service routine is given at 
+    65                                  ; the end of this file (and the vector points to it). See the "Oscillation 
+    66                                  ; Stop Detection" chapter of the M30102 data sheets.
+    67                                  ;----------------------------------------------------------------------
+    68  00010  7E9F6000                 	bset	0,cm2			; enable Oscillation stop detection bit
+    69  00014  7E9F6100                 	bset    1,cm2			; enable OSC stop detection interrupt. 
+    70                                  
+    71                                  ; now determine type of Xin (RC osc or XTAL), ensure it is running and if so
+    72                                  ; switch to it
+    73                                  
+    74  00018  7EBF6300                 	btst  	3,cm2			; check for Xin operation.
+    75  0001C  6A0E                     	jz     ENABLE_XIN		; jmp if MAIN OSC is running
+    76  0001E  7E9F3B00                 	bset    3,cm1			; if not, enable RC OSC. 
+    77  00022  04                       	nop						; wait for RC OSC to stabilize
+    78  00023  04                       	nop
+    79  00024  04                       	nop						
+    80  00025  7EBF6300                 	btst  	3,cm2			; check for RC-OSC operation.
+    81  00029  6E04                     	jnz     CONTINUE_INIT 	; skip if RC-OSC is not running. 
+    82                                  	
+    83  0002B                           ENABLE_XIN:
+    84  0002B  B70C00                Z  	mov.b   #00h,cm2	   ; Set main clock to Xin  
+    85                                  
+    86  0002E                           CONTINUE_INIT:	
+    87  0002E  7E8F5000                 	bclr	0,protect	   ; inhibit writing to Clock Control Registers 0,1,2.	 	  	
+    88  00032  EB300000                 	ldc	    #0000h,	flg
+    89  00036  EB600004                 	ldc	    #data_SE_top,	sb	;set sb register 
+    90  0003A  EB200F00                 	ldintb	#VECTOR_ADR
+               EB1000F8 
+    91  00042  EB64                     	fset     i		;enable interrupts. Do not disable interrupt while 
+    92                                  	                ;using the USB Monitor. 
+    93                                  
+    94                                  ;====================================================================
+    95                                  ; Variable area initialize. This code uses the macros in "sect30.inc"  
+    96                                  ; for initializing C variables. Clears global variables, sets 
+    97                                  ; intialized variables, etc.
+    98                                  ;====================================================================
+    99                                  ; NEAR area initialize.
+   100                                  ;--------------------------------------------------------------------
+   101                                  ; bss zero clear
+   102                                  ;--------------------------------------------------------------------
+   103                                  	N_BZERO	bss_SE_top,bss_SE
+   104  00044  B4                1 M Z  	mov.b	#00H, R0L
+   105  00045  AA0000r           1 M S  	mov.w	#(bss_SE_top & 0FFFFH), A1
+   106  00048  75C30000r         1 M    	mov.w	#sizeof bss_SE , R3
+   107  0004C  7CEA              1 M    	sstr.b	
+   108                           1 M    	.endm
+   109                                  	N_BZERO	bss_SO_top,bss_SO
+   110  0004E  B4                1 M Z  	mov.b	#00H, R0L
+   111  0004F  AA0000r           1 M S  	mov.w	#(bss_SO_top & 0FFFFH), A1
+   112  00052  75C30000r         1 M    	mov.w	#sizeof bss_SO , R3
+   113  00056  7CEA              1 M    	sstr.b	
+   114                           1 M    	.endm
+   115                                  	N_BZERO	bss_NE_top,bss_NE
+   116  00058  B4                1 M Z  	mov.b	#00H, R0L
+   117  00059  AA0000r           1 M S  	mov.w	#(bss_NE_top & 0FFFFH), A1
+   118  0005C  75C30000r         1 M    	mov.w	#sizeof bss_NE , R3
+   119  00060  7CEA              1 M    	sstr.b	
+   120                           1 M    	.endm
+   121                                  	N_BZERO	bss_NO_top,bss_NO
+   122  00062  B4                1 M Z  	mov.b	#00H, R0L
+   123  00063  AA0000r           1 M S  	mov.w	#(bss_NO_top & 0FFFFH), A1
+* M16C FAMILY ASSEMBLER *   SOURCE LIST       Wed Mar 21 16:11:30 2012  PAGE 003
+
+  SEQ.  LOC.   OBJ.              0XMSDA ....*....SOURCE STATEMENT....7....*....8....*....9....*....0....*....1....*....2....*....3....*....4
+
+   124  00066  75C30000r         1 M    	mov.w	#sizeof bss_NO , R3
+   125  0006A  7CEA              1 M    	sstr.b	
+   126                           1 M    	.endm
+   127                                  
+   128                                  ;---------------------------------------------------------------------
+   129                                  ; initialize data section
+   130                                  ;---------------------------------------------------------------------
+   131                                  	N_BCOPY data_SEI_top,data_SE_top,data_SE
+   132  0006C  A20000r           1 M S  	mov.w	#(data_SEI_top & 0FFFFH),A0
+   133  0006F  74C300r           1 M    	mov.b	#(data_SEI_top >>16),R1H
+   134  00072  AA0004            1 M S  	mov.w	#data_SE_top ,A1
+   135  00075  75C30000r         1 M    	mov.w	#sizeof data_SE , R3
+   136  00079  7CE8              1 M    	smovf.b
+   137                           1 M    	.endm
+   138                                  	N_BCOPY	data_SOI_top,data_SO_top,data_SO
+   139  0007B  A20000r           1 M S  	mov.w	#(data_SOI_top & 0FFFFH),A0
+   140  0007E  74C300r           1 M    	mov.b	#(data_SOI_top >>16),R1H
+   141  00081  AA0000r           1 M S  	mov.w	#data_SO_top ,A1
+   142  00084  75C30000r         1 M    	mov.w	#sizeof data_SO , R3
+   143  00088  7CE8              1 M    	smovf.b
+   144                           1 M    	.endm
+   145                                  	N_BCOPY	data_NEI_top,data_NE_top,data_NE
+   146  0008A  A20000r           1 M S  	mov.w	#(data_NEI_top & 0FFFFH),A0
+   147  0008D  74C300r           1 M    	mov.b	#(data_NEI_top >>16),R1H
+   148  00090  AA0000r           1 M S  	mov.w	#data_NE_top ,A1
+   149  00093  75C30000r         1 M    	mov.w	#sizeof data_NE , R3
+   150  00097  7CE8              1 M    	smovf.b
+   151                           1 M    	.endm
+   152                                  	N_BCOPY	data_NOI_top,data_NO_top,data_NO
+   153  00099  A20000r           1 M S  	mov.w	#(data_NOI_top & 0FFFFH),A0
+   154  0009C  74C300r           1 M    	mov.b	#(data_NOI_top >>16),R1H
+   155  0009F  AA0000r           1 M S  	mov.w	#data_NO_top ,A1
+   156  000A2  75C30000r         1 M    	mov.w	#sizeof data_NO , R3
+   157  000A6  7CE8              1 M    	smovf.b
+   158                           1 M    	.endm
+   159                                  
+   160                                  
+   161                                  ;====================================================================
+   162                                  
+   163                                  	.stk	-40     ;for use with stkviewer. Note the KNC30 version 
+   164                                  	                ; of the compiler does not have this option.
+   165                                  
+   166                                  ;====================================================================
+   167                                  ; heap area initialize. Uncomment these instructions if using memory 
+   168                                  ; allocate functions.
+   169                                  ;---------------------------------------------------------------------
+   170                                  ;	.glb	__mbase
+   171                                  ;	.glb	__mnext
+   172                                  ;	.glb	__msize
+   173                                  ;	mov.w	#(heap_top&0FFFFH), __mbase
+   174                                  ;	mov.w	#(heap_top>>16), __mbase+2
+   175                                  ;	mov.w	#(heap_top&0FFFFH), __mnext
+   176                                  ;	mov.w	#(heap_top>>16), __mnext+2
+   177                                  ;	mov.w	#(HEAPSIZE&0FFFFH), __msize
+   178                                  ;	mov.w	#(HEAPSIZE>>16), __msize+2
+   179                                  ;====================================================================
+   180                                  ; Initialize standard I/O
+   181                                  ;---------------------------------------------------------------------
+   182                                  	.glb	_init
+   183                                  ;	.call	_init,G			;for use with stkviewer
+   184                                  ;	jsr.a	_init           ;required if using I/O stream serial port driver
+   185                                  
+* M16C FAMILY ASSEMBLER *   SOURCE LIST       Wed Mar 21 16:11:30 2012  PAGE 004
+
+  SEQ.  LOC.   OBJ.              0XMSDA ....*....SOURCE STATEMENT....7....*....8....*....9....*....0....*....1....*....2....*....3....*....4
+
+   186                                  
+   187                                  ;====================================================================
+   188                                  ; Call main() function
+   189                                  ;---------------------------------------------------------------------
+   190                                  
+   191                                  	.glb	_main
+   192  000A8  FD000000r             A  	jsr.a	_main
+   193                                  
+   194                                  ;====================================================================
+   195                                  ; exit() function. This function is used in case of accidental return 
+   196                                  ; from main() or debugging code could be placed here. 
+   197                                  ;---------------------------------------------------------------------
+   198                                  	.glb	_exit
+   199                                  	.glb	$exit
+   200  000AC                           _exit:			   ; End program
+   201  000AC                           $exit:
+   202  000AC  FEFF                  B  	jmp	_exit
+   203                                  	.einsf			;for use with stkviewer
+   204                                  ;====================================================================
+   205                                  ; dummy interrupt function. Used for all unassigned interrupts
+   206                                  ;---------------------------------------------------------------------
+   207  000AE                           dummy_int:
+   208  000AE  FB                       	reit
+   209                                  
+   210                                  ;====================================================================
+   211                                  ; Minimal interrupt service routine for Oscillator Stop Interrupt. If an
+   212                                  ; Oscillator Stop Interrupt occurs and CM1, bit 1 is not cleared,
+   213                                  ; multiple interrupts will occur. This routine assumes the watchdog
+   214                                  ; timer IS NOT ENABLED (watchdog and OSC STOP share same interrupt vector).
+   215                                  ; It is strongly recommended that the user implement a complete interrupt
+   216                                  ; service routine.
+   217                                  ;---------------------------------------------------------------------
+   218  000AF                           basic_oscstop:
+   219  000AF  7E8F6100                     bclr 1,cm2
+   220  000B3  7E8F7204                 	bclr 2,tcss
+   221  000B7  FB                       	reit
+   222                                  
+   223                                  	.end
+
+Information List
+
+TOTAL ERROR(S)    00000
+TOTAL WARNING(S)  00000
+TOTAL LINE(S)     00223   LINES
+
+Section List
+
+Attr        Size          Name
+DATA     0000000(00000H)  data_SE
+DATA     0000000(00000H)  bss_SE
+DATA     0000000(00000H)  data_SO
+DATA     0000000(00000H)  bss_SO
+DATA     0000000(00000H)  data_NE
+DATA     0000000(00000H)  bss_NE
+DATA     0000000(00000H)  data_NO
+DATA     0000000(00000H)  bss_NO
+DATA     0000008(00008H)  ustack
+DATA     0000001(00001H)  istack
+DATA     0000000(00000H)  heap
+ROMDATA  0000000(00000H)  rom_FE
+ROMDATA  0000000(00000H)  rom_FO
+ROMDATA  0000000(00000H)  data_SEI
+ROMDATA  0000000(00000H)  data_SOI
+ROMDATA  0000000(00000H)  data_NEI
+ROMDATA  0000000(00000H)  data_NOI
+ROMDATA  0000000(00000H)  switch_table
+CODE     0000000(00000H)  interrupt
+CODE     0000000(00000H)  program
+CODE     0000000(00000H)  program_S
+CODE     0000192(000C0H)  vector
+CODE     0000036(00024H)  fvector
+CODE     0000184(000B8H)  interrupt

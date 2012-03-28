@@ -1,0 +1,23 @@
+[PROJECT]
+ProjectName=andrew
+WorkingDirectory=C:\MTOOL\MSV30102-SKP\Sample_Code\Andrew
+OutputDirectory=.
+ProjectFile=C:\MTOOL\MSV30102-SKP\Sample_Code\Andrew\Demo.tmk
+ProjectInfoFile=C:\MTOOL\MSV30102-SKP\Sample_Code\Andrew\Demo.tmi
+TargetName=M16C Family
+Type=1
+GoalFile=C:\MTOOL\MSV30102-SKP\Sample_Code\Andrew\Demo.x30
+[NC]
+Name=KNC30WA
+Version=V2001
+[MEMBER]
+Count=0
+[DOCUMENTFILE]
+Count=0
+[ITEM]
+ActiveFactory=default
+FactoryName1=default
+ActiveTagName1=all
+Count=1
+[TOOL]
+ToolCount=0

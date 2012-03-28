@@ -1,0 +1,22 @@
+/*****************************************************************************
+*
+*	File Name: compass.h                                         
+*                                                                  
+*	Content:   Header file for compass.c            
+*                                                                  
+*   source and make any necessary changes to support your hardware and application.
+*                                                               
+*=============================================================================
+*	Revision 1.0 05Oct2010
+*
+*===========================================================================*/
+#define ENABLE_WAIT	1		// Set to 1 to enable WAIT modes. 
+
+
+#ifndef RTC_WAIT_C
+extern void init_compass(int desired, int current);
+extern void change_heading(int degreeChange);
+extern int get_heading(void);
+extern void set_compass(float degrees);
+extern int get_compass(void);
+#endif

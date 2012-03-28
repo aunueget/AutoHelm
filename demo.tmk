@@ -1,0 +1,113 @@
+####################################################################
+# Makefile for TM V.3.11
+# Copyright 1998-2001 MITSUBISHI ELECTRIC CORPORATION
+# AND MITSUBISHI ELECTRIC SEMICONDUCTOR APPLICATION ENGINEERING CORPORATION
+# All Rights Reserved.
+#
+#	Notice	:	Don't edit.
+#	Date	:	2012 03(March) 20(Tuesday) PM.07.44
+#	Project	:	Demo
+####################################################################
+
+DELETE	=	@-del
+LNLIST	=	$(PROJECT).cmd
+PRJDIR	=	C:\MTOOL\MSV30102-SKP\Sample_Code\Andrew
+LMC	=	LMC30
+CC	=	KNC30
+AR	=	LB30
+UTL	=	utl30
+AS	=	AS30
+LIBFILE	=	$(PROJECT).lib
+OUTDIR	=	.
+MKDIR	=	@-mkdir
+ABSFILE	=	$(PROJECT).x30
+ODINCMD	=	$(OUTDIR)
+LN	=	LN30
+TARGET	=	$(ABSFILE)
+ECHO	=	@-echo
+MKFILE	=	$(PROJECT).tmk
+PROJECT	=	Demo
+TYPE	=	@-type
+LFLAGS	=	-G -MS -L nc30lib -O $(OUTDIR)\$(TARGET)
+UTLFLAGS	=	
+CFLAGS	=	-c -dir $(OUTDIR) -g
+LMCFLAGS	=	-L
+LIBFLAGS	=	-C
+AFLAGS	=	-LM -O$(OUTDIR)
+.SUFFIXES: .a30 .r30 .c .x30 .lib
+.PHONY: all
+all: \
+		$(OUTDIR)\$(TARGET) 
+.PHONY: clean
+clean: 
+	$(DELETE) $(OUTDIR)\$(TARGET)
+	$(DELETE) $(ODINCMD)\$(LNLIST)
+	$(DELETE) $(OUTDIR)\ncrt0.r30
+	$(DELETE) $(OUTDIR)\10sk.r30
+	$(DELETE) $(OUTDIR)\main.r30
+	$(DELETE) $(OUTDIR)\compass.r30
+	$(DELETE) $(OUTDIR)\delayTimer.r30
+	$(DELETE) $(OUTDIR)\MagAcc.r30
+	$(DELETE) $(OUTDIR)\MitsuI2C.r30
+$(OUTDIR)\10sk.r30: \
+		.\10sk.c \
+		.\10sk.h \
+		.\sfr10.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) 10sk.c
+$(ODINCMD)\$(LNLIST): \
+		.\$(MKFILE) 
+	$(ECHO)\$(MRLFLAGS) $(LFLAGS) >	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\ncrt0.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\10sk.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\main.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\compass.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\delayTimer.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\MagAcc.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\MitsuI2C.r30 >>	$(ODINCMD)\$(LNLIST)
+$(OUTDIR)\$(TARGET): \
+		$(ODINCMD)\$(LNLIST) \
+		$(OUTDIR)\ncrt0.r30 \
+		$(OUTDIR)\10sk.r30 \
+		$(OUTDIR)\main.r30 \
+		$(OUTDIR)\compass.r30 \
+		$(OUTDIR)\delayTimer.r30 \
+		$(OUTDIR)\MagAcc.r30 \
+		$(OUTDIR)\MitsuI2C.r30 
+	$(LN) @$(ODINCMD)\$(LNLIST)
+$(OUTDIR)\MagAcc.r30: \
+		.\MagAcc.c \
+		MagAcc.h \
+		.\Mitsu_I2C.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) MagAcc.c
+$(OUTDIR)\MitsuI2C.r30: \
+		.\MitsuI2C.c \
+		.\Mitsu_I2C.h \
+		.\delayTimer.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) MitsuI2C.c
+$(OUTDIR)\compass.r30: \
+		.\compass.c \
+		.\compass.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) compass.c
+$(OUTDIR)\delayTimer.r30: \
+		.\delayTimer.c \
+		.\delayTimer.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) delayTimer.c
+$(OUTDIR)\main.r30: \
+		.\main.c \
+		.\sfr10.h \
+		.\10sk.h \
+		.\convert_temp.h \
+		.\compass.h \
+		.\delayTimer.h \
+		MagAcc.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) main.c
+$(OUTDIR)\ncrt0.r30: \
+		.\ncrt0.a30 \
+		.\sect30.inc 
+	$(AS) $(MRAFLAGS) $(AFLAGS) ncrt0.a30
+####################################################################
+# End of makefile for TM V.3.11
+# Copyright 1998-2001 MITSUBISHI ELECTRIC CORPORATION
+# AND MITSUBISHI ELECTRIC SEMICONDUCTOR APPLICATION ENGINEERING CORPORATION
+# All Rights Reserved.
+####################################################################

@@ -1,0 +1,399 @@
+##########################################
+# (1) LINK INFORMATION                   #
+##########################################
+LN30 @.\Demo.cmd
+
+# LINK FILE INFORMATION
+NCRT0 (.\ncrt0.r30)
+	Mar 21 16:11:30 2012
+
+10SK (.\10sk.r30)
+	Mar 21 16:11:31 2012
+
+MAIN (.\main.r30)
+	Mar 21 16:11:31 2012
+
+COMPASS (.\compass.r30)
+	Mar 21 16:11:31 2012
+
+DELAYTIMER (.\delayTimer.r30)
+	Mar 21 16:11:31 2012
+
+MAGACC (.\MagAcc.r30)
+	Mar 21 16:11:31 2012
+
+MITSUI2C (.\MitsuI2C.r30)
+	Mar 21 16:11:31 2012
+
+_F4ADD (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:47:51 2001
+
+_F4DIV (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:48:37 2001
+
+_F4GE (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:24 2001
+
+_F4LE (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:24 2001
+
+_F4MUL (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:25 2001
+
+_F4SUB (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:26 2001
+
+_F4TOF8 (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:26 2001
+
+_F8ADD (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:35 2001
+
+_F8GE (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:48 2001
+
+_F8LE (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:48 2001
+
+_F8LTOR (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:49 2001
+
+_F8MUL (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:55 2001
+
+_F8SUB (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:59 2001
+
+_F8TOF4 (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:59 2001
+
+_F8TOI4 (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:59 2001
+
+_FTOL (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:01 2001
+
+_I4TOF4 (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:02 2001
+
+_I4TOF8 (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:02 2001
+
+_LTOF (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:03 2001
+
+SQRT (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:26 2001
+
+ATAN2 (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:30 2001
+
+ERRNO (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:30 2001
+
+_F4LTOR (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:25 2001
+
+_F4RTOL (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:26 2001
+
+_F8DIV (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:45 2001
+
+_F8EQ (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:48 2001
+
+_F8LT (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:49 2001
+
+_F8NE (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:58 2001
+
+_F8RTOL (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:49:59 2001
+
+ACOS (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:29 2001
+
+ASIN (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:29 2001
+
+ATAN (C:\MTOOL\LIB30\nc30lib.lib)
+	Feb  1 19:50:29 2001
+
+
+##########################################
+# (2) SECTION INFORMATION                #
+##########################################
+# SECTION                        ATR TYPE    START  LENGTH ALIGN MODULENAME
+data_SE                          ABS DATA    000400 000000       NCRT0
+bss_SE                           REL DATA    000400 000000 2     NCRT0
+data_SO                          REL DATA    000400 000000       NCRT0
+bss_SO                           REL DATA    000400 000000       NCRT0
+data_NE                          REL DATA    000400 000000 2     NCRT0
+                                 REL DATA    000400 000004       10SK
+                                 REL DATA    000404 000006       MITSUI2C
+                                 REL DATA    00040A 000002       ERRNO
+bss_NE                           REL DATA    00040C 000000 2     NCRT0
+                                 REL DATA    00040C 00003E       10SK
+                                 REL DATA    00044A 00003A       MAIN
+                                 REL DATA    000484 000002       DELAYTIMER
+                                 REL DATA    000486 000048       MAGACC
+                                 REL DATA    0004CE 00000C       MITSUI2C
+data_NO                          REL DATA    0004DA 000000       NCRT0
+                                 REL DATA    0004DA 00000F       MAIN
+bss_NO                           REL DATA    0004E9 000000       NCRT0
+                                 REL DATA    0004E9 00000A       10SK
+                                 REL DATA    0004F3 000002       MAIN
+ustack                           REL DATA    0004F5 000008       NCRT0
+istack                           ABS DATA    00077F 000001       NCRT0
+heap                             REL DATA    000780 000000       NCRT0
+rom_FE                           ABS ROMDATA 0FA000 000000       NCRT0
+                                 REL ROMDATA 0FA000 000008       MAIN
+rom_FO                           REL ROMDATA 0FA008 000000       NCRT0
+                                 REL ROMDATA 0FA008 000060       MAIN
+                                 REL ROMDATA 0FA068 00000B       COMPASS
+data_SEI                         REL ROMDATA 0FA073 000000       NCRT0
+data_SOI                         REL ROMDATA 0FA073 000000       NCRT0
+data_NEI                         REL ROMDATA 0FA073 000000       NCRT0
+                                 REL ROMDATA 0FA073 000004       10SK
+                                 REL ROMDATA 0FA077 000006       MITSUI2C
+                                 REL ROMDATA 0FA07D 000002       ERRNO
+data_NOI                         REL ROMDATA 0FA07F 000000       NCRT0
+                                 REL ROMDATA 0FA07F 00000F       MAIN
+switch_table                     REL ROMDATA 0FA08E 000000       NCRT0
+interrupt                        REL CODE    0FA08E 000000       NCRT0
+                                 REL CODE    0FA08E 0000B8       NCRT0
+program                          REL CODE    0FA146 000000       NCRT0
+                                 REL CODE    0FA146 00055C 2     10SK
+                                 REL CODE    0FA6A2 000FDA 2     MAIN
+                                 REL CODE    0FB67C 00015A 2     COMPASS
+                                 REL CODE    0FB7D6 000055 2     DELAYTIMER
+                                 REL CODE    0FB82C 00095D 2     MAGACC
+                                 REL CODE    0FC18A 000486 2     MITSUI2C
+                                 REL CODE    0FC610 000714 2     _F4ADD
+                                 REL CODE    0FCD24 00020E 2     _F4DIV
+                                 REL CODE    0FCF32 000081 2     _F4GE
+                                 REL CODE    0FCFB4 000081 2     _F4LE
+                                 REL CODE    0FD036 0001BD 2     _F4MUL
+                                 REL CODE    0FD1F4 00001D 2     _F4SUB
+                                 REL CODE    0FD212 000092 2     _F4TOF8
+                                 REL CODE    0FD2A4 000AD3 2     _F8ADD
+                                 REL CODE    0FDD78 0000A7 2     _F8GE
+                                 REL CODE    0FDE20 0000A7 2     _F8LE
+                                 REL CODE    0FDEC8 000072 2     _F8LTOR
+                                 REL CODE    0FDF3A 0002DD 2     _F8MUL
+                                 REL CODE    0FE218 000030 2     _F8SUB
+                                 REL CODE    0FE248 0000BD 2     _F8TOF4
+                                 REL CODE    0FE306 000029 2     _F8TOI4
+                                 REL CODE    0FE330 000198 2     _FTOL
+                                 REL CODE    0FE4C8 000026 2     _I4TOF4
+                                 REL CODE    0FE4EE 000026 2     _I4TOF8
+                                 REL CODE    0FE514 000108 2     _LTOF
+                                 REL CODE    0FE61C 0001EE 2     SQRT
+                                 REL CODE    0FE80A 000140 2     ATAN2
+                                 REL CODE    0FE94A 000061 2     _F4LTOR
+                                 REL CODE    0FE9AC 000060 2     _F4RTOL
+                                 REL CODE    0FEA0C 0002E3 2     _F8DIV
+                                 REL CODE    0FECF0 00007C 2     _F8EQ
+                                 REL CODE    0FED6C 0000A7 2     _F8LT
+                                 REL CODE    0FEE14 00007C 2     _F8NE
+                                 REL CODE    0FEE90 000066 2     _F8RTOL
+                                 REL CODE    0FEEF6 000101 2     ACOS
+                                 REL CODE    0FEFF8 0001CD 2     ASIN
+                                 REL CODE    0FF1C6 000285 2     ATAN
+program_S                        REL CODE    0FF44B 000000       NCRT0
+vector                           ABS CODE    0FF800 0000C0       NCRT0
+fvector                          ABS CODE    0FFFDC 000024       NCRT0
+# Total -------------------------------------------------------------------
+                                     DATA           0000FE(0000254) Byte(s)
+                                     ROMDATA        00008E(0000142) Byte(s)
+                                     CODE           0054A1(0021665) Byte(s)
+
+##########################################
+# (3) GLOBAL LABEL INFORMATION           #
+##########################################
+$DIS_delay         0fa670  $MitsuI2C_beginT   0fc550  $MitsuI2C_reques   0fc58c
+$MitsuI2C_send     0fc56e  $Run_Task          0fa4a0  $_f4ltor           0fe94a
+$_f4rtol           0fe9ac  $_f8ltor           0fdec8  $_f8rtol           0fee90
+$_ftol             0fe330  $_ltof             0fe514  $addTask           0fa340
+$changeVariable    0faba2  $degreeDifferanc   0fb430  $disp_ctrlw        0fa620
+$disp_dataw        0fa5d0  $display           0fa4b4  $enqueue           0fa292
+$exit              0fa13a  $getCompassReadi   0fae86  $get_compass       0fb7c8
+$modPID            0fb17a  $readAccReg        0fb934  $readMagReg        0fb99c
+$set_OffSet        0fb6d0  $set_compass       0fb772  $set_desired       0fb790
+$set_strCurrent    0fb6ea  $set_strDesired    0fb67c  $tdelay            0fa32c
+$toStr             0fab02  $vector_normaliz   0fc0ec  $wait_ticks        0fb7f8
+$writeAccReg       0fb906  $writeMagReg       0fb96e  _GBL_run_schedul   000402
+_GBL_task_list     00040c  _Keyinput_task     0fa1a0  _LCD_write         0fa54a
+_MitsuI2C_Init     0fc18a  _MitsuI2C_availa   0fc5f4  _MitsuI2C_calibr   0fc286
+_MitsuI2C_endTra   0fc588  _MitsuI2C_getHea   0fc2e2  _MitsuI2C_receiv   0fc5fa
+_MitsuI2C_testPu   0fc1b2  _PID               000456  _Run_RR_Schedule   0fa444
+__SB__             000400  __f4add            0fc610  __f4div            0fcd24
+__f4ge             0fcf32  __f4le             0fcfb4  __f4mul            0fd036
+__f4sub            0fd1f4  __f4tof8           0fd212  __f8add            0fd2a4
+__f8div            0fea0c  __f8eq             0fecf0  __f8ge             0fdd78
+__f8le             0fde20  __f8lt             0fed6c  __f8mul            0fdf3a
+__f8ne             0fee14  __f8sub            0fe218  __f8tof4           0fe248
+__f8toi4           0fe306  __i4tof4           0fe4c8  __i4tof8           0fe4ee
+_a                 000486  _acos              0feef6  _allowedToleranc   00044e
+_asin              0feff8  _atan              0ff1c6  _atan2             0fe80a
+_bailSCLrx         000408  _buff              0004f2  _c_ticks           000484
+_data              0004ce  _dataCount         000404  _dataPos           000406
+_deg_S             0fa000  _delay_ticker      0fb814  _delay_time        000448
+_dequeue_key       0fa26c  _disp_datar        0fa588  _enableDefault     0fb8c4
+_errno             00040a  _exit              0fa13a  _followHeading_t   0fb4b6
+_followTaskPrior   000482  _followTaskTime    000480  _getCalibrateRea   0fb8a6
+_get_digital_hea   0fbc14  _heading           0004da  _heading_from      0fbc48
+_initMagAcc        0fb82c  _init_BSP          0fa146  _init_Task_Timer   0fa400
+_init_Timer        0fb7d6  _init_disp         0fa4f4  _key               0004f4
+_key_buff          0004ea  _key_in            0004f0  _key_mode          0004f1
+_key_out           0004ef  _keyinput_down     0fa238  _kiZeros           00047e
+_m                 000492  _m_max             00049e  _m_min             0004aa
+_main              0fa6a2  _menu              0fa008  _modPID_task       0fae5a
+_mode_task         0fa808  _motorKill         0fae4c  _motorRunning      000454
+_motorToggle       0faddc  _moveCount         000452  _moveShaft         000450
+_num               0fa035  _numbers           0fa068  _paused            00044a
+_read              0fbc0c  _readAcc           0fb9d6  _readMag           0fba80
+_removeTask        0fa3a6  _selected_menu     00044c  _sqrt              0fe61c
+_sys_mode          0004f3  _test_max          0004b6  _test_min          0004c2
+_tick_count        0fb826  _tick_timer_intr   0fa2ae  _vector_cross      0fbeb4
+_vector_dot        0fc030  start              0fa08e  
+
+##########################################
+# (4) GLOBAL EQU SYMBOL INFORMATION      #
+##########################################
+
+##########################################
+# (5) GLOBAL EQU BIT-SYMBOL INFORMATION  #
+##########################################
+
+##########################################
+# (6) LOCAL LABEL INFORMATION            #
+##########################################
+@ NCRT0 ( .\ncrt0.r30 )
+@ 10SK ( .\10sk.r30 )
+@ MAIN ( .\main.r30 )
+@ COMPASS ( .\compass.r30 )
+@ DELAYTIMER ( .\delayTimer.r30 )
+@ MAGACC ( .\MagAcc.r30 )
+@ MITSUI2C ( .\MitsuI2C.r30 )
+@ _F4ADD ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4DIV ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4GE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4LE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4MUL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4SUB ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4TOF8 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8ADD ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8GE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LTOR ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8MUL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8SUB ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8TOF4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8TOI4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _FTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4TOF4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4TOF8 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _LTOF ( C:\MTOOL\LIB30\nc30lib.lib )
+@ SQRT ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ATAN2 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ERRNO ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4LTOR ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4RTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8DIV ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8EQ ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LT ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8NE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8RTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ACOS ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ASIN ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ATAN ( C:\MTOOL\LIB30\nc30lib.lib )
+
+##########################################
+# (7) LOCAL EQU SYMBOL INFORMATION       #
+##########################################
+@ NCRT0 ( .\ncrt0.r30 )
+@ 10SK ( .\10sk.r30 )
+@ MAIN ( .\main.r30 )
+@ COMPASS ( .\compass.r30 )
+@ DELAYTIMER ( .\delayTimer.r30 )
+@ MAGACC ( .\MagAcc.r30 )
+@ MITSUI2C ( .\MitsuI2C.r30 )
+@ _F4ADD ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4DIV ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4GE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4LE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4MUL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4SUB ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4TOF8 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8ADD ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8GE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LTOR ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8MUL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8SUB ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8TOF4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8TOI4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _FTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4TOF4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4TOF8 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _LTOF ( C:\MTOOL\LIB30\nc30lib.lib )
+@ SQRT ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ATAN2 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ERRNO ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4LTOR ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4RTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8DIV ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8EQ ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LT ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8NE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8RTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ACOS ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ASIN ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ATAN ( C:\MTOOL\LIB30\nc30lib.lib )
+
+##########################################
+# (8) LOCAL EQU BIT-SYMBOL INFORMATION   #
+##########################################
+@ NCRT0 ( .\ncrt0.r30 )
+@ 10SK ( .\10sk.r30 )
+@ MAIN ( .\main.r30 )
+@ COMPASS ( .\compass.r30 )
+@ DELAYTIMER ( .\delayTimer.r30 )
+@ MAGACC ( .\MagAcc.r30 )
+@ MITSUI2C ( .\MitsuI2C.r30 )
+@ _F4ADD ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4DIV ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4GE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4LE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4MUL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4SUB ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4TOF8 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8ADD ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8GE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LTOR ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8MUL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8SUB ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8TOF4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8TOI4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _FTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4TOF4 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _I4TOF8 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _LTOF ( C:\MTOOL\LIB30\nc30lib.lib )
+@ SQRT ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ATAN2 ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ERRNO ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4LTOR ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F4RTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8DIV ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8EQ ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8LT ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8NE ( C:\MTOOL\LIB30\nc30lib.lib )
+@ _F8RTOL ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ACOS ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ASIN ( C:\MTOOL\LIB30\nc30lib.lib )
+@ ATAN ( C:\MTOOL\LIB30\nc30lib.lib )
+

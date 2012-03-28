@@ -1,0 +1,23 @@
+[CWatch Window]
+num of points=21
+cwp0=compDiff
+cwp1=moveShaftTime
+cwp2=integral
+cwp3=previous_error
+cwp4=heading.current
+cwp5=heading.desired
+cwp6=compDiff
+cwp7=moveCount
+cwp8=PID.out
+cwp9=error
+cwp10=PID.dvar
+cwp11=PID.ivar
+cwp12=PID.out
+cwp13=PID.Kp
+cwp14=PID.dvar
+cwp15=moveShaft
+cwp16=dterm
+cwp17=heading.current
+cwp18=newDigitHeading
+cwp19=old_value
+cwp20=PID.runTime
