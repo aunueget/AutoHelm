@@ -3,8 +3,8 @@
 
 
 
-int followTaskTime;
-int followTaskPrior;
+extern int followTaskTime;
+extern int followTaskPrior;
 
 void initFollowTask(void);
 void followHeading_task(void);

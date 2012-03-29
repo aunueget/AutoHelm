@@ -1,8 +1,12 @@
 
-
+#include "10sk.h"
 #include "Globals.h"
+#include "PIDController.h"
+#include "FollowTask.h"
 
 
+int followTaskTime;
+int followTaskPrior;
 
 void initFollowTask(){
 	followTaskTime=100;

@@ -9,8 +9,7 @@
 *   Revision 1.2  2002-06-07 14:00:18-04  bembry
 *   Fixed flicker problem.  Chang Temp conversion equation fixes problem at "0" crossover point.
 *================================================================================*/
-#include <stdlib.h>
-#include <math.h>
+
 #include "10sk.h"		/* SFR register definition */
 #include "Globals.h"
 #include "delayTimer.h" /* delay timer for compass I2C readings*/

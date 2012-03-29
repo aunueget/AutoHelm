@@ -1,34 +1,46 @@
 
-
+#include "10sk.h"
 #include "Globals.h"
-
+#include "PIDController.h"
+#include "Interupts.h"
 
 
 
 void initInterupts(void){
 	 /*** enable electric motor one-shot start interupt.****/   /*** enable 32K clcok for real time clock.****/
-	prc0 = 1;       // Enable writes to clock control register.
-	cm03 = 1;       // Xcin, Xcout high drive mode  
-	cm04 = 1;       // Enable Xcin, Xcout ports 
-	cm2 = 0x03;      // Enable OSC STOPPED detection 
-	prc0 = 0;       // Disable writes to clock control register. 
-	t1ck0 = 1; t1ck1 = 1; // Set Timer 1 count source to 1/32
-	pre1 = 2;       // Load prescaler with 1
-	t1 = 2;       // load t1 with 4  2 x 5 = 10 :// 32.768 KHz / 32 / 10 = 102.4 times a second = 10 msec
+	// prc0 = 1;       // Enable writes to clock control register.
+	// cm03 = 1;       // Xcin, Xcout high drive mode  
+	// cm04 = 1;       // Enable Xcin, Xcout ports 
+	// cm2 = 0x03;      // Enable OSC STOPPED detection 
+	// prc0 = 0;       // Disable writes to clock control register. 
+	// t1ck1 = 0; t1ck0 = 1;  // Set Timer 1 count source to 1/8
+	// pre1 = 100;       // Load prescaler with 1
+	// t1 = 82;       // load t1 with 4  2 x 5 = 10 :// 32.768 KHz / 32 / 10 = 102.4 times a second = 10 msec
+	// DISABLE_INTS
+	// t1ic = 0x06; 	// timer 1 underflow interrut.  (S4). 
+	// ENABLE_INTS 
+	  // tcss = SRC_SEL;  //  timers X, Y, Z set to 16MHz divide by 8 
+   // prex = 99;      // 16MHz xtal, divide by 8, times 10,000 counts-> 5msec interrrupts.
+   // tx = 99;        // so set prescaler and timer to 100-1
+   // prey = 99;      // 16MHz xtal, divide by 8, times 5000 counts-> 2.5msec interrrupts.
+   // typr = 49;        
+   // prez = 99;      // 16MHz xtal, divide by 8, times 2500 counts-> 1,25msec interrrupts.
+   // tzpr = 24;        
+
+	txck1 = 0; txck0 = 1;      // Set Timer X source clock to "/8"
+    prex = 99;     // 16MHz xtal, divide by 8, times 10,000 counts-> 5msec interrrupts.
+    tx = 99;        // load timer x with 82. 
 	DISABLE_INTS
-	t1ic = 0x06; 	// timer 1 underflow interrut.  (S4). 
+	txic = 0x06;	// Timer X interrupt request control register.   
 	ENABLE_INTS 
+	//txs = 1;		// enable timer X
 
 	/*** enable one-shot motor kill interupt.****/
-	tzmod0 = 0;      // Set Timer Z timer mode to programmable wait one-shot
-	tzmod1 = 1;		// Set Timer Z timer mode 
-	tzck0 = 1;     //divide by 32 = 1 milli second seconds long period
-	tzck1 = 1;		//divide by 32 = 1 milli second seconds long period
-	tzwc = 1;
-	prez = 0;		// load Z prescaller with 0 = 1ms
-	tzpr = 1;		//load Z primary with 5 = 5 x 1 milli secs = 5 milliseconds
-	tzpum0 = 0;
-	//tzpum1 = 0; 
+	tzmod0 = 0;      // Set Timer Z timer mode to timer mode
+	tzmod1 = 0;		// Set Timer Z timer mode 
+	tzck1 = 0; tzck0 = 1;     //16Mhz divide by 8 
+	prez = 99;		// load Z prescaller with 99 = 1/10ms
+	tzpr = 9;		//load Z primary with 9 x 99 = 1 milliseconds
 	DISABLE_INTS
 	tzic = 0x02;	// Timer Z interrupt request control register.   
 	ENABLE_INTS 
@@ -84,30 +96,28 @@ Description:    this helps create an intermitent shaft movement by waiting the
 					spending the same moveDelay time without moving the shaft
 *****************************************************************************/
 void motorToggle(){
-	DISABLE_INTS
 	tzpr = (unsigned char) PID.runTime;	
-	tzs=1;
 	if(!p4_2&&motorRunning<0&&PID.runTime>0){
 		p4_1=0;//set move out to off
 		p4_0=1;//set move in to on
 		if(PID.runTime<9){
-			tzos=1;
+			tzs=1;
 		}
 	}
 	else if(!p4_3&&motorRunning>0&&PID.runTime>0){
 		p4_0=0;//set move in to off
 		p4_1=1;//set move out to on
 		if(PID.runTime<9){
-			tzos=1;
+			tzs=1;
 		}
 	}
 	else{
 		p4_1=0;//set move out to off
 		p4_0=0;//set move in to off
 	}
-	ENABLE_INTS 
 }
 void motorKill(void){
 		p4_1=0;//set move out to off
 		p4_0=0;//set move in to off
+		tzs=0;
 }

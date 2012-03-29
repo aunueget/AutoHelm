@@ -5,7 +5,7 @@
 # All Rights Reserved.
 #
 #	Notice	:	Don't edit.
-#	Date	:	2012 03(March) 20(Tuesday) PM.07.44
+#	Date	:	2012 03(March) 28(Wednesday) PM.11.38
 #	Project	:	Demo
 ####################################################################
 
@@ -43,12 +43,14 @@ clean:
 	$(DELETE) $(OUTDIR)\$(TARGET)
 	$(DELETE) $(ODINCMD)\$(LNLIST)
 	$(DELETE) $(OUTDIR)\ncrt0.r30
-	$(DELETE) $(OUTDIR)\10sk.r30
 	$(DELETE) $(OUTDIR)\main.r30
 	$(DELETE) $(OUTDIR)\compass.r30
 	$(DELETE) $(OUTDIR)\delayTimer.r30
 	$(DELETE) $(OUTDIR)\MagAcc.r30
 	$(DELETE) $(OUTDIR)\MitsuI2C.r30
+	$(DELETE) $(OUTDIR)\Globals.r30
+	$(DELETE) $(OUTDIR)\MenuTask.r30
+	$(DELETE) $(OUTDIR)\FollowTask.r30
 $(OUTDIR)\10sk.r30: \
 		.\10sk.c \
 		.\10sk.h \
@@ -58,12 +60,17 @@ $(ODINCMD)\$(LNLIST): \
 		.\$(MKFILE) 
 	$(ECHO)\$(MRLFLAGS) $(LFLAGS) >	$(ODINCMD)\$(LNLIST)
 	$(ECHO)\$(OUTDIR)\ncrt0.r30 >>	$(ODINCMD)\$(LNLIST)
-	$(ECHO)\$(OUTDIR)\10sk.r30 >>	$(ODINCMD)\$(LNLIST)
 	$(ECHO)\$(OUTDIR)\main.r30 >>	$(ODINCMD)\$(LNLIST)
 	$(ECHO)\$(OUTDIR)\compass.r30 >>	$(ODINCMD)\$(LNLIST)
 	$(ECHO)\$(OUTDIR)\delayTimer.r30 >>	$(ODINCMD)\$(LNLIST)
 	$(ECHO)\$(OUTDIR)\MagAcc.r30 >>	$(ODINCMD)\$(LNLIST)
 	$(ECHO)\$(OUTDIR)\MitsuI2C.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\Globals.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\MenuTask.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\Interupts.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\FollowTask.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\PIDController.r30 >>	$(ODINCMD)\$(LNLIST)
+	$(ECHO)\$(OUTDIR)\10sk.r30 >>	$(ODINCMD)\$(LNLIST)
 $(OUTDIR)\$(TARGET): \
 		$(ODINCMD)\$(LNLIST) \
 		$(OUTDIR)\ncrt0.r30 \
@@ -72,18 +79,60 @@ $(OUTDIR)\$(TARGET): \
 		$(OUTDIR)\compass.r30 \
 		$(OUTDIR)\delayTimer.r30 \
 		$(OUTDIR)\MagAcc.r30 \
-		$(OUTDIR)\MitsuI2C.r30 
+		$(OUTDIR)\MitsuI2C.r30 \
+		$(OUTDIR)\Globals.r30 \
+		$(OUTDIR)\Interupts.r30 \
+		$(OUTDIR)\PIDController.r30 \
+		$(OUTDIR)\MenuTask.r30 \
+		$(OUTDIR)\FollowTask.r30 
 	$(LN) @$(ODINCMD)\$(LNLIST)
+$(OUTDIR)\FollowTask.r30: \
+		.\FollowTask.c \
+		.\FollowTask.h \
+		.\Globals.h \
+		.\PIDController.h \
+		.\10sk.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) FollowTask.c
+.\Globals.c: \
+		.\Globals.h 
+$(OUTDIR)\Globals.r30: \
+		.\Globals.c \
+		.\Globals.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) Globals.c
+.\Interupts.c: \
+		.\Interupts.h 
+$(OUTDIR)\Interupts.r30: \
+		.\Interupts.c \
+		.\PIDController.h \
+		.\Globals.h \
+		.\Interupts.h \
+		.\10sk.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) Interupts.c
 $(OUTDIR)\MagAcc.r30: \
 		.\MagAcc.c \
 		MagAcc.h \
 		.\Mitsu_I2C.h 
 	$(CC) $(MRCFLAGS) $(CFLAGS) MagAcc.c
+$(OUTDIR)\MenuTask.r30: \
+		.\MenuTask.c \
+		.\Globals.h \
+		.\MenuTask.h \
+		.\FollowTask.h \
+		.\10sk.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) MenuTask.c
 $(OUTDIR)\MitsuI2C.r30: \
 		.\MitsuI2C.c \
 		.\Mitsu_I2C.h \
 		.\delayTimer.h 
 	$(CC) $(MRCFLAGS) $(CFLAGS) MitsuI2C.c
+.\PIDController.c: \
+		.\PIDController.h 
+$(OUTDIR)\PIDController.r30: \
+		.\PIDController.c \
+		.\PIDController.h \
+		.\Globals.h \
+		.\10sk.h 
+	$(CC) $(MRCFLAGS) $(CFLAGS) PIDController.c
 $(OUTDIR)\compass.r30: \
 		.\compass.c \
 		.\compass.h 
@@ -96,10 +145,13 @@ $(OUTDIR)\main.r30: \
 		.\main.c \
 		.\sfr10.h \
 		.\10sk.h \
-		.\convert_temp.h \
 		.\compass.h \
 		.\delayTimer.h \
-		MagAcc.h 
+		MagAcc.h \
+		.\MenuTask.h \
+		.\FollowTask.h \
+		.\Globals.h \
+		.\PIDController.h 
 	$(CC) $(MRCFLAGS) $(CFLAGS) main.c
 $(OUTDIR)\ncrt0.r30: \
 		.\ncrt0.a30 \

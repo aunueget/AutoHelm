@@ -1,16 +1,21 @@
-#ifndef GLOBALVARS_H
-#define GLOBALVARS_H
 
-int c_ticks;
-int allowedTolerance;
-int moveCount;
-char key;
-int motorRunning;
-const char deg_S[8] = {0x08,0x14,0x08,0x00,0x00,0x00,0x00,0x00};
+
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
+#include "compass.h"
+
+extern int c_ticks;
+extern int allowedTolerance;
+extern int moveCount;
+extern char key;
+extern int motorRunning;
+extern const char deg_S[8];
 // added object from compass.h
-compass heading={0,0,0,"    ","   "};
+extern compass heading;
 
 int getCompassReading(int avg);
 int degreeDifferance(int absoluteValue,int current,int desired);//calc error for pid
+void toStr(char strNum[9],int value,int menuNum);
 
 #endif  

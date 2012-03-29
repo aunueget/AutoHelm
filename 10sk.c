@@ -128,14 +128,12 @@ void init_BSP(void)
 #endif
     init_Task_Timers();
 	ALL_LED_ON
-    txck0 = 1;      // Set Timer X source clock to "/8"
-    txck1 = 0;
-    prex = 100;     // load X prescaller with 100
-    tx = 82;        // load timer x with 82. 
+	t1ck1 = 0; t1ck0 = 1;  // Set Timer 1 count source to 1/8
+	pre1 = 100;       // Load prescaler with 1
+	t1 = 82;       // load t1 with 4  2 x 5 = 10 :// 32.768 KHz / 32 / 10 = 102.4 times a second = 10 msec
 	DISABLE_INTS
-	txic = 0x01;	// Timer X interrupt request control register.   
+	t1ic = 0x01; 	// timer 1 underflow interrut.  (S4). 
 	ENABLE_INTS 
-	txs = 1;		// enable timer X
 #if USE_KEY_INPUT_BUFFER  == 1
 	addTask(Keyinput_task, 5,(MAX_TASKS-1));	  // Sample key input every 25 ms. 
 #endif

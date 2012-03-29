@@ -325,10 +325,10 @@ USBmon   .equ	0FF900h		;USB Monitor vector for UART0
 
 	.lword	dummy_int		; uart1 transmit(for user)(vector 19)
   	.lword  dummy_int   	; uart1 receive (vector 20)
-	.glb _motorToggle
-	.lword	_motorToggle	; Timer1 Interrupt (vector 21)	electric motor start oneshot
 	.glb _tick_timer_intr	
-	.lword	_tick_timer_intr; TimerX Interrupt (vector 22)
+	.lword	_tick_timer_intr; Timer1 Interrupt (vector 21)	
+	.glb _motorToggle
+	.lword	_motorToggle	; TimerX Interrupt (vector 22)electric motor start onesho
 	.glb _delay_ticker
 	.lword	_delay_ticker	; TimerY Interrupt (vector 23)
 	.glb _motorKill

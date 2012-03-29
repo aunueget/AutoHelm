@@ -1,3 +1,14 @@
+#include <stdlib.h>
+#include "Globals.h"
+
+int c_ticks;
+int allowedTolerance;
+int moveCount;
+char key;
+int motorRunning;
+const char deg_S[8] = {0x08,0x14,0x08,0x00,0x00,0x00,0x00,0x00};
+// added object from compass.h
+compass heading={0,0,0,"    ","   "};
 
 /*****************************************************************************
 Name:        getCompassReading 
@@ -36,4 +47,31 @@ int degreeDifferance(int absoluteValue,int current,int desired){
 	else{
 		return (-1*compDiff);
 	}
+}
+
+void toStr(char strNum[9],int value,int menuNum){
+	strNum[0]=' ';
+	strNum[1]=' ';
+	if(menuNum==8){
+		strNum[2]='>';
+	}
+	else{
+		strNum[2]=' ';
+	}
+	strNum[3]=(value/100)+48;
+	strNum[4]=(((value%100)/10))+48;
+	strNum[5]=(value%10)+48;
+	if(menuNum!=1 ){
+		strNum[6]=0x07;
+	}
+	else{
+		strNum[6]=' ';
+	}
+	if(menuNum==9){
+		strNum[7]='<';
+	}
+	else{
+		strNum[7]=' ';
+	}
+	strNum[8]='\0';
 }

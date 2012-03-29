@@ -1,9 +1,10 @@
 
 
-
-
+#include <stdlib.h>
+#include "10sk.h"
 #include "Globals.h"
-
+#include "PIDController.h"
+pidCon PID;
 void initPID(void){
 	//init PID variables
 	PID.previous_error=0;  //PID error variable
@@ -14,7 +15,7 @@ void initPID(void){
 	PID.Kd=50;
 	PID.out=0;
 	PID.runTime=0;
-	kiZeros=4;
+	//kiZeros=4;
 	//end init PID variables
 
 
@@ -31,7 +32,7 @@ void modPID_task(void)
 	int error=0;
 	int dterm=0;
 	if(degreeDifferance(1,heading.current,heading.desired)>allowedTolerance){
-		error=modPID(degreeDifferance(0,heading.desired,heading.current));
+		error=degreeDifferance(0,heading.desired,heading.current);
 		dterm=degreeDifferance(0,heading.current,PID.dvar);
 		PID.dvar=heading.current;
 		PID.ivar = PID.ivar + error;

@@ -10,7 +10,7 @@ typedef struct{
 	double out;
 	int runTime;
 }pidCon;
-pidCon PID;
+extern pidCon PID;
 
 void initPID(void);
 void modPID_task(void);

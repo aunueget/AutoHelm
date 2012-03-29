@@ -1,7 +1,22 @@
 
 
-#include "Globals.h"
+
 #include "10sk.h"		/* SFR register definition */
+#include "Globals.h"
+#include "MenuTask.h"
+#include "PIDController.h"
+#include "FollowTask.h"
+
+
+unsigned char sys_mode;
+int paused, selected_menu;
+const char menu[5][9] = {
+{" KP     "},
+{" KI     "},
+{" KD     "},
+{"TOLERANC"},
+{" PAUSED "}};
+const char num[15] = {'0','1','2','3','4','5','6','7','8','9',':','F','C',' ','.'};
 
 void initMenuTask(){
   //menu prep*******************************************
@@ -38,6 +53,7 @@ void menuTask(void)
 					PID.out=0;
 					//end init PID variables
 					addTask(followHeading_task, followTaskTime, followTaskPrior);
+					txs=1;
 				}
 				else if(key==KEY_A||key==KEY_B){
 					sys_mode=MENUCHANGE;
@@ -61,6 +77,7 @@ void menuTask(void)
 					DISABLE_INTS
 					motorRunning=0;
 					ENABLE_INTS
+					txs=0;
 					removeTask(followHeading_task);
 			}
 		break;
@@ -113,6 +130,7 @@ void menuTask(void)
 						PID.out=0;
 						//end init PID variables
 						addTask(followHeading_task, followTaskTime, followTaskPrior);
+						txs=1;
 				break;
 			}
 		break;
@@ -156,30 +174,4 @@ int changeVariable(int menuSelected,int changeValue){
 		break;
 	}
 	return 0;
-}
-void toStr(char strNum[9],int value,int menuNum){
-	strNum[0]=' ';
-	strNum[1]=' ';
-	if(menuNum==8){
-		strNum[2]='>';
-	}
-	else{
-		strNum[2]=' ';
-	}
-	strNum[3]=(value/100)+48;
-	strNum[4]=(((value%100)/10))+48;
-	strNum[5]=(value%10)+48;
-	if(menuNum!=1 ){
-		strNum[6]=0x07;
-	}
-	else{
-		strNum[6]=' ';
-	}
-	if(menuNum==9){
-		strNum[7]='<';
-	}
-	else{
-		strNum[7]=' ';
-	}
-	strNum[8]='\0';
 }
