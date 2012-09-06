@@ -1,0 +1,19 @@
+move compass away from micro board
+
+make a pid controller for tilt to autopilot based on tilt
+look up how to get the tilt only reading
+
+---------------------make it so that you can one key change course by one degree port and starboard
+
+-----------------make the ok activate and scroll thru main menu
+
+--------------------make the current course show at least update once a second
+
+--------------------fix freezes probable on bailouts
+
+add alarm when 20-30 degrees off course
+
+-------------make it so the derivative in PID doesnt start for a few seconds when autopilot starts
+----------------make it so the integral in PID doesnt start for a few seconds when autopilot starts
+
+

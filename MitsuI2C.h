@@ -44,8 +44,12 @@
 #define CPU_INT16S 	short int
 #define CPU_INT32U 	unsigned int
 #define CPU_INT32S 	int
-
-
+/*
+*********************************************************************************************************
+*                                         variables
+*********************************************************************************************************
+*/
+extern int problemI2C;
 /*
 *********************************************************************************************************
 *                                         FUNCTION PROTOTYPES
@@ -60,6 +64,7 @@ extern int MitsuI2C_beginTransmission(CPU_INT08U address);
 extern int MitsuI2C_send(CPU_INT08U number);
 extern void MitsuI2C_endTransmission();
 extern int MitsuI2C_requestFrom(CPU_INT08U address, int count);
-extern CPU_INT08U MitsuI2C_receive();
+extern CPU_INT08U MitsuI2C_receive(int pos);
 extern int MitsuI2C_available();
+extern int problemOccured();
 #endif                           /* End of file      */

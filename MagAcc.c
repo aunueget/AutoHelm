@@ -20,6 +20,7 @@ vector m_max; // maximum magnetometer values, used for calibration
 vector m_min; // minimum magnetometer values, used for calibration
 vector test_max;
 vector test_min;
+volatile double tilt;
 
 // Constructors ////////////////////////////////////////////////////////////////
 
@@ -30,21 +31,22 @@ void initMagAcc(void)
 	m_max.x = +372; m_max.y = +622; m_max.z = 612;
 	m_min.x = -786; m_min.y = -646; m_min.z = -528;
 	test_max.x=0; test_max.y=0; test_max.z=0;
-	test_min.x=0; test_min.y=0; test_min.z=0;	
+	test_min.x=0; test_min.y=0; test_min.z=0;
+	tilt=0;
 	MitsuI2C_Init();
 	enableDefault();
 //	getCalibrateReadings();
 }
-void getCalibrateReadings(){
-	int i=0;
-	//File *dataFile;
-	//dataFile=fopen("testData.csv","w");
-	for(i=0;i<100;i++){
-		readAcc();
-		readMag();
-	}
-	//fclose(dataFile);
-}
+// void getCalibrateReadings(){
+	// int i=0;
+	// File *dataFile;
+	// dataFile=fopen("testData.csv","w");
+	// for(i=0;i<100;i++){
+		// readAcc();
+		// readMag();
+	// }
+	// fclose(dataFile);
+// }
 
 // Public Methods //////////////////////////////////////////////////////////////
 
@@ -87,7 +89,7 @@ unsigned char readAccReg(unsigned char reg)
 		if(MitsuI2C_send(reg))
 	//MitsuI2C_endTransmission();
 			if(MitsuI2C_requestFrom(ACC_ADDRESS, 1)){
-				value = MitsuI2C_receive();
+				value = MitsuI2C_receive(0);
 				MitsuI2C_endTransmission();
 			}
 
@@ -113,7 +115,7 @@ if(MitsuI2C_beginTransmission(MAG_ADDRESS))
 	if(MitsuI2C_send(reg))
 		//MitsuI2C_endTransmission();
 		if(MitsuI2C_requestFrom(MAG_ADDRESS, 1)){
-			value = MitsuI2C_receive();
+			value = MitsuI2C_receive(0);
 			MitsuI2C_endTransmission();
 		}
 
@@ -129,21 +131,26 @@ int yla;
 int yha;
 int zla;
 int zha;
+int prevAvailable=0;
+int bailout=0;
 MitsuI2C_beginTransmission(ACC_ADDRESS);
 // assert the MSB of the address to get the accelerometer
 // to do slave-transmit subaddress updating.
 MitsuI2C_send(MagAcc_OUT_X_L_A | (1 << 7));
 //MitsuI2C_endTransmission();
 MitsuI2C_requestFrom(ACC_ADDRESS, 6);
+if(problemOccured()){
+	initMagAcc();
+}
 
-while (MitsuI2C_available() < 6);
+while (bailout++<200&&((prevAvailable>=MitsuI2C_available())&&MitsuI2C_available() < 6));
 
-xla = MitsuI2C_receive();
-xha = MitsuI2C_receive();
-yla = MitsuI2C_receive();
-yha = MitsuI2C_receive();
-zla = MitsuI2C_receive();
-zha = MitsuI2C_receive();
+xla = MitsuI2C_receive(0);
+xha = MitsuI2C_receive(1);
+yla = MitsuI2C_receive(2);
+yha = MitsuI2C_receive(3);
+zla = MitsuI2C_receive(4);
+zha = MitsuI2C_receive(5);
 
 a.x = (xha << 8 | xla) >> 4;
 a.y = (yha << 8 | yla) >> 4;
@@ -160,19 +167,25 @@ int yhm;
 int ylm;
 int zhm;
 int zlm;
+
+int bailout=0;
+
 MitsuI2C_beginTransmission(MAG_ADDRESS);
 MitsuI2C_send(MagAcc_OUT_X_H_M);
 //MitsuI2C_endTransmission();
 MitsuI2C_requestFrom(MAG_ADDRESS, 6);
+if(problemOccured()){
+	initMagAcc();
+}
 
-while (MitsuI2C_available() < 6);
+while (bailout++<200&&MitsuI2C_available() < 6);
 
-xhm = MitsuI2C_receive();
-xlm = MitsuI2C_receive();
-yhm = MitsuI2C_receive();
-ylm = MitsuI2C_receive();
-zhm = MitsuI2C_receive();
-zlm = MitsuI2C_receive();
+xhm = MitsuI2C_receive(0);
+xlm = MitsuI2C_receive(1);
+yhm = MitsuI2C_receive(2);
+ylm = MitsuI2C_receive(3);
+zhm = MitsuI2C_receive(4);
+zlm = MitsuI2C_receive(5);
 
 m.x = (xhm << 8 | xlm);
 m.y = (yhm << 8 | ylm);
@@ -221,6 +234,7 @@ return heading_from(tempVector);
 int heading_from(vector from)
 {
     vector temp_a;
+	vector tiltFrom={0,0,1};
 	vector E;
     vector N;
 	int heading; 
@@ -241,7 +255,10 @@ int heading_from(vector from)
     vector_cross(&m, &temp_a, &E);
     vector_normalize(&E);
     vector_cross(&temp_a, &E, &N);
-
+	
+	//compute tilt
+    tilt = (double)(atan2(vector_dot(&N, &tiltFrom), vector_dot(&temp_a, &tiltFrom)) * 180.0 / M_PI);//deleted round
+	if (tilt < 0) tilt += 360;
     // compute heading
     heading = (int)(atan2(vector_dot(&E, &from), vector_dot(&N, &from)) * 180 / M_PI);//deleted round
     if (heading < 0) heading += 360;

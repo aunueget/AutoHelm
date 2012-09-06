@@ -1,0 +1,59 @@
+/*****************************************************************************
+*
+*	File Name:  compass.c                                        
+*                                                                  
+*	Content:    provides a structure for handleling actual and desired compass heading                
+*                                                                                                                                
+*=============================================================================
+*	Revision 1.0 05Oct2010 mck_andrew@yahoo.com
+*
+*===========================================================================*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "compass.h"
+const char numbers[11] = {'0','1','2','3','4','5','6','7','8','9',' '};
+
+// compass init_compass(compass *heading,int desir,int curr){
+	// heading->current=curr;
+	// heading->desired=desir;
+	// set_strDesired(&heading,heading->desired);
+	// return heading;
+// }
+
+
+// void set_strDesired(compass *heading,int value){
+	// heading->strDesired[0]=(value/100)+48;
+	// heading->strDesired[1]=(((value%100)/10))+48;
+	// heading->strDesired[2]=(value%10)+48;
+	// heading->strDesired[3]='\0';
+// }
+// void set_OffSet(compass *heading){
+	// heading->offset=heading->desired-heading->current;
+// }
+	
+// void set_strCurrent(compass *heading,int value){
+	// heading->strCurrent[0]=(value/1000)+48;
+	// heading->strCurrent[1]=((value%1000)/100)+48;
+	// heading->strCurrent[2]=(((value%1000)%100)/10)+48;
+	// heading->strCurrent[3]=(((value%1000)%100)%10)+48;
+	// heading->strCurrent[4]='\0';
+// }
+void set_compass(compass *heading,int compass){
+	//int temp2;
+	heading->current=compass;
+	//set_strCurrent(heading,heading->current);
+}
+void set_desired(compass *heading,int compass){
+	// if(compass<0){
+		// compass=360+compass;
+	// }
+	// else if(compass>359){
+		// compass=compass-360;
+	// }
+	heading->desired=compass;
+	//set_strDesired(heading,heading->desired);
+}
+int get_compass(compass *heading){
+	return heading->current;
+}

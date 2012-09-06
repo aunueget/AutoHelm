@@ -13,13 +13,20 @@
 #include "10sk.h"		/* SFR register definition */
 #include "Globals.h"
 #include "delayTimer.h" /* delay timer for compass I2C readings*/
-#include "compass.h"  //analog compass andrew mcknight
+//#include "compass.h"  //analog compass andrew mcknight
 #include "MenuTask.h"
 #include "PIDController.h"
 #include "FollowTask.h"
+#include "DisplayTask.h"
 #include "MagAcc.h"		//digital compass revised andrew mcknight
 
 //motor controls are in interupts.c
+
+int displayTaskTime;
+int displayTaskPrior;
+
+void initDisplayTask();
+void displayCurrent();
 
 /*****************************************************************************
 Name:		main
@@ -52,6 +59,7 @@ void main()
 	initPID();
 	initMenuTask();
 	initFollowTask();
+	initDisplayTask();
 	initMagAcc();
 
 	//intro screen
@@ -61,8 +69,11 @@ void main()
     //addTask(display_task, 30, 1);
     addTask(menuTask, 35, 3);
 	//addTask(shaftDelayToggle_task,1,2);
-    addTask(modPID_task, 100,1);
 
     Run_RR_Scheduler();
 }
+
+
+
+
 

@@ -63,6 +63,7 @@ CPU_INT08U data[12];
 int dataCount=0;
 int dataPos=0;
 int bailSCLrx=0;
+int problemI2C=0;
 /*
 *********************************************************************************************************
 *                                      LOCAL FUNCTION PROTOTYPES
@@ -274,6 +275,7 @@ static  CPU_INT08U  readByte (CPU_INT08S ack)
 		while(!SCL_READ()){
 			waitOne();
 			if(bailOut++>200){/* Wait for 1/2 of a clock period                           */    
+				problemI2C=1;
 				return 0;
 			}
 		}
@@ -333,6 +335,7 @@ static  CPU_INT08U  writeByte (CPU_INT08U var)
 		while(!SCL_READ()){               /* Send the high part of the clk pulse (clock the data in)  */
 			waitOne();
 			if(bailOut++>200){/* Wait for 1/2 of a clock period                           */    
+				problemI2C=1;
 				return 0;
 			}
 		}		
@@ -341,6 +344,7 @@ static  CPU_INT08U  writeByte (CPU_INT08U var)
         waitOne();												/* Wait for 1/2 of a clock period (clock period now over)   */
 	}
 	if(!acknowledge()){//if slave failed to receive
+		problemI2C=1;
 		return 0;
 	}
     return 1;
@@ -367,6 +371,7 @@ static CPU_INT08U acknowledge(void){
 		SCL_SET_TX();
 		SCL_SET_CLK_LOW();	
 		waitOne();
+		problemI2C=1;
 		return 0;
 	}
 	SCL_SET_TX();
@@ -404,6 +409,7 @@ int MitsuI2C_beginTransmission(CPU_INT08U address){
 	issueStart();
 	if(!writeByte ((CPU_INT08U) address)){ 	       // send slave address
 		issueStop();
+		problemI2C=1;
 		return 0;
 	}
 	return 1;
@@ -411,6 +417,7 @@ int MitsuI2C_beginTransmission(CPU_INT08U address){
 int MitsuI2C_send(CPU_INT08U number){
 	if(!writeByte ((CPU_INT08U) number)){ 	       // send slave address
 		issueStop();
+		problemI2C=1;
 		return 0;
 	}
 	return 1;
@@ -424,6 +431,7 @@ int MitsuI2C_requestFrom(CPU_INT08U address, int count){
 	dataCount=0;
 	dataPos=0;
 	if(!MitsuI2C_beginTransmission(address+1)){
+		problemI2C=1;
 		return 0;
 	}
 	for(i=0; i < count;i++)
@@ -442,14 +450,17 @@ int MitsuI2C_requestFrom(CPU_INT08U address, int count){
 int MitsuI2C_available(){
 	return dataCount;
 }
-CPU_INT08U MitsuI2C_receive(){
-	if(dataPos>=6){
-		return 0;
-	}
-	return data[dataPos++];
+CPU_INT08U MitsuI2C_receive(int pos){
+	return data[pos];
 
 }
-
+int problemOccured(){
+	if(problemI2C){
+		problemI2C=0;
+		return 1;
+	}
+	return 0;
+}
 
 
  

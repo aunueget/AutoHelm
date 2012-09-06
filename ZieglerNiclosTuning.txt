@@ -1,0 +1,20 @@
+Tu=450 tenths of a second per period
+ultimate gain=300 ku 
+
+4 PI
+ku/2.2=136=Kp
+2kp/Tu=.6=Ki
+
+4 classic PID
+.60*Ku=180=Kp
+2Kp/Tu=.8=Ki
+Kp*Tu/8=10125=Kd
+
+no over shoot
+.2Ku=60=Kp
+2Kp/Tu=.26=Ki
+KpTu/3=9000=Kd
+
+
+
+

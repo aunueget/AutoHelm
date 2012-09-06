@@ -8,9 +8,15 @@ typedef struct{
 	int dvar;//
 	double Kp,Ki,Kd;//pid constants
 	double out;
+	double dterm;
 	int runTime;
+	int KdCount;
+//	int settleTime;
 }pidCon;
+
 extern pidCon PID;
+extern int pidPrior;
+extern int pidTaskTime;
 
 void initPID(void);
 void modPID_task(void);

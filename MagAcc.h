@@ -52,7 +52,7 @@ typedef struct vector
 {
 float x, y, z;
 } vector;
-
+extern volatile double tilt;
 
 extern void initMagAcc(void);
 

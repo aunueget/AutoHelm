@@ -96,25 +96,33 @@ Description:    this helps create an intermitent shaft movement by waiting the
 					spending the same moveDelay time without moving the shaft
 *****************************************************************************/
 void motorToggle(){
-	tzpr = (unsigned char) PID.runTime;	
-	if(!p4_2&&motorRunning<0&&PID.runTime>0){
-		p4_1=0;//set move out to off
-		p4_0=1;//set move in to on
-		if(PID.runTime<9){
+	tzs=0;
+	prez = 99;
+	tzpr = (unsigned char) PID.runTime;
+	if(PID.runTime>9){
+		if(motorRunning<0){//!p4_2&&motorRunning<0&&PID.runTime>0){
+			//p4_1=0;//set move out to off
+			p4_0=1;//set move in to on
+			// if(PID.runTime<100){
+				// tzs=1;
+			// }
+		}
+		else if(motorRunning>0){// if(!p4_3&&motorRunning>0&&PID.runTime>0){
+			//p4_0=0;//set move in to off
+			p4_1=1;//set move out to on
+			// if(PID.runTime<100){
+				// tzs=1;
+			// }
+		}
+		if(PID.runTime<100){
 			tzs=1;
 		}
 	}
-	else if(!p4_3&&motorRunning>0&&PID.runTime>0){
-		p4_0=0;//set move in to off
-		p4_1=1;//set move out to on
-		if(PID.runTime<9){
-			tzs=1;
-		}
-	}
-	else{
-		p4_1=0;//set move out to off
-		p4_0=0;//set move in to off
-	}
+
+	// else{
+		// p4_1=0;//set move out to off
+		// p4_0=0;//set move in to off
+	// }
 }
 void motorKill(void){
 		p4_1=0;//set move out to off
